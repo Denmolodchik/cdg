@@ -1,14 +1,7 @@
-load 'branch1.rb'
-load 'branch2.rb'
-load 'html.rb'
-load 'answer.rb'
+require_relative 'branch1'
+require_relative 'branch2'
 require 'socket'
 
-module Server
-  extend Branch1
-  extend Branch2
-  extend HTML
-  extend Answer
   server = TCPServer.new 80
 
       loop do
@@ -23,16 +16,15 @@ module Server
         end
 
         if host[1] == "branch1.mybank.ru"
-          branch1(socket, method[1])
+          Branch1.new(socket, method[1]).branch1
         end   
 
         if host[1] == "branch2.mybank.ru"
-          branch2(socket, method[1])
+          Branch2.new(socket, method[1]).branch2
         end 
       
         unless host[1] == "branch1.mybank.ru" || host[1] == "branch2.mybank.ru"
           answer_400(socket, html_error('Данный домен не поддерживается'))
         end
       end
-end
 

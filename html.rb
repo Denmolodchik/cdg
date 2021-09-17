@@ -16,7 +16,7 @@ module HTML
     end
 
     def html_menu1
-      html = "<html>\r\n"+
+        html = "<html>\r\n"+
              '<link rel="icon" href="data:,">'+
              '<a href="/deposits/1">Депозит 1</a></br>'+
              '<a href="/deposits/2">Депозит 2</a></br>'+
@@ -25,10 +25,10 @@ module HTML
     end
 
     def html_menu2
-      html = "<html>\r\n"+
-             '<link rel="icon" href="data:,">'+
-             '<a href="/deps/1">Депозит 1</a></br>'+
-             '<a href="/deps/2">Депозит 2</a></br>'+
-             "</html>"
+        html = "<html>\r\n"+
+           '<link rel="icon" href="data:,">'+
+           '<a href="/deps/1">Депозит 1</a></br>'+
+           '<a href="/deps/2">Депозит 2</a></br>'+
+           "</html>"
     end
 end
