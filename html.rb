@@ -1,34 +1,28 @@
-module HTML
-    def html_deposit(id, months, percent)
+module HTML1
+    def html_deposit(deposit)
         html = "<html>\r\n"+
           '<link rel="icon" href="data:,">'+
-          "<h2>Уникальный номер = #{id}</h1>\r\n"+
-          "<h2>Количество месяцев = #{months}</h1>\r\n"+
-          "<h2>Процент = #{percent}</h1>\r\n"+
+          "<h2>Уникальный номер = #{deposit.id}</h1>\r\n"+
+          "<h2>Количество месяцев = #{deposit.months}</h1>\r\n"+
+          "<h2>Процент = #{deposit.percent}</h1>\r\n"+
           "</html>"
     end
 
-    def html_error(error)
+    def html_string(string)
         html = "<html>\r\n"+
           '<link rel="icon" href="data:,">'+
-          "<h2>#{error}</h2>\r\n"+
+          "<h2>#{string}</h2>\r\n"+
           "</html>"
     end
 
-    def html_menu1
+    def html_menu(permitted_paths)
+        i = 1
         html = "<html>\r\n"+
-             '<link rel="icon" href="data:,">'+
-             '<a href="/deposits/1">Депозит 1</a></br>'+
-             '<a href="/deposits/2">Депозит 2</a></br>'+
-             '<a href="/deposits/3">Депозит 3</a></br>'+
-             "</html>"
-    end
+             '<link rel="icon" href="data:,">'
 
-    def html_menu2
-        html = "<html>\r\n"+
-           '<link rel="icon" href="data:,">'+
-           '<a href="/deps/1">Депозит 1</a></br>'+
-           '<a href="/deps/2">Депозит 2</a></br>'+
-           "</html>"
+        permitted_paths.each { |x| html = html + "<a href=#{x}>Депозит #{i}</a></br>" 
+            i = i + 1 }
+
+        html = html+"</html>"
     end
 end

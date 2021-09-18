@@ -1,5 +1,5 @@
-require_relative 'branch1'
-require_relative 'branch2'
+require_relative 'html'
+require_relative 'branch'
 require 'socket'
 
   server = TCPServer.new 80
@@ -16,15 +16,22 @@ require 'socket'
         end
 
         if host[1] == "branch1.mybank.ru"
-          Branch1.new(socket, method[1]).branch1
+          branch1 = Branch.new(socket, "deposits")
+          branch1.add_deposit(10,10)
+          branch1.add_deposit(20,20)
+          branch1.add_deposit(30,30)
+          branch1.branch_answer(method[1])
         end   
 
         if host[1] == "branch2.mybank.ru"
-          Branch2.new(socket, method[1]).branch2
+          branch2 = Branch.new(socket, "deps")
+          branch2.add_deposit(40,40)
+          branch2.add_deposit(50,50)
+          branch2.branch_answer(method[1])
         end 
       
         unless host[1] == "branch1.mybank.ru" || host[1] == "branch2.mybank.ru"
-          answer_400(socket, html_error('Данный домен не поддерживается'))
+          answer_400(socket, html_string('Данный домен не поддерживается'))
         end
       end
 
