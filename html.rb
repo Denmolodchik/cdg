@@ -1,4 +1,4 @@
-module HTML1
+module HTML
     def html_deposit(deposit)
         html = "<html>\r\n"+
           '<link rel="icon" href="data:,">'+

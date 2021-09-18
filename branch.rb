@@ -2,7 +2,7 @@ require_relative 'html'
 require_relative 'answer'
 require_relative 'deposit'
 class Branch
-    include HTML1
+    include HTML
 
     def initialize(socket, name_path)
         @socket = socket

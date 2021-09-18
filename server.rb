@@ -1,8 +1,14 @@
+require_relative 'answer'
 require_relative 'html'
 require_relative 'branch'
 require 'socket'
 
+module Server
+  extend HTML
+
   server = TCPServer.new 80
+  PERMITTED_METHODS = ["GET","HEAD"]
+  PERMITTED_HOSTS = ["branch1.mybank.ru","branch2.mybank.ru"]
 
       loop do
         socket = server.accept
@@ -10,9 +16,19 @@ require 'socket'
 
         while i<2 do
           line = socket.readline
-          method = line.split if i==0
+          method = line.split if i==0 
           host = line.split if i==1
-          i+=1
+          i = i+1
+        end
+
+        unless PERMITTED_METHODS.include?(method[0])
+          Answer.new(socket, html_string('Данный метод не поддерживается'), "400 Bad Request").answer
+          next
+        end
+        
+        unless PERMITTED_HOSTS.include?(host[1])
+          Answer.new(socket, html_string('Данный хост не поддерживается'), "400 Bad Request").answer
+          next
         end
 
         if host[1] == "branch1.mybank.ru"
@@ -29,9 +45,5 @@ require 'socket'
           branch2.add_deposit(50,50)
           branch2.branch_answer(method[1])
         end 
-      
-        unless host[1] == "branch1.mybank.ru" || host[1] == "branch2.mybank.ru"
-          answer_400(socket, html_string('Данный домен не поддерживается'))
-        end
       end
-
+end
