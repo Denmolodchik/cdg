@@ -1,49 +1,61 @@
-require_relative 'answer'
+require_relative 'responce'
 require_relative 'html'
-require_relative 'branch'
+require_relative 'branch1'
+require_relative 'request'
+require_relative 'controller1'
 require 'socket'
 
-module Server
-  extend HTML
-
   server = TCPServer.new 80
-  PERMITTED_METHODS = ["GET","HEAD"]
-  PERMITTED_HOSTS = ["branch1.mybank.ru","branch2.mybank.ru"]
 
       loop do
         socket = server.accept
         i = 0
+        request = Array.new
 
-        while i<2 do
-          line = socket.readline
-          method = line.split if i==0 
-          host = line.split if i==1
-          i = i+1
+        while (line = socket.gets.chomp) do
+          break if line.empty?
+          request[i] = line.chomp
+          i += 1       
         end
 
-        unless PERMITTED_METHODS.include?(method[0])
-          Answer.new(socket, html_string('Данный метод не поддерживается'), "400 Bad Request").answer
+        request = Request.new(request)
+
+        unless request.errors
+          if request.headers['Host'] == 'branch1.mybank.ru'
+            branch1 = Branch1.new(request.path)
+            unless branch1.errors
+              controller = Controller1.new(branch1.id)
+              unless controller.errors
+                html = HTML.new.html_deposit(controller.deposit[:deposit])
+                responce = Response.new({responce_code: controller.deposit[:responce_code], html: html})
+                socket.write responce.responce
+                socket.write "\r\n"  
+                socket.write html
+                socket.close
+              else
+                html = HTML.new.html_string(controller.errors[:body])
+                responce = Response.new({responce_code: controller.errors[:responce_code], html: html})
+                socket.write responce.responce
+                socket.write "\r\n"  
+                socket.write html
+                socket.close
+              end
+            else
+              html = HTML.new.html_string(branch1.errors[:body])
+              responce = Response.new({responce_code: branch1.errors[:responce_code], html: html})
+              socket.write responce.responce
+              socket.write "\r\n"  
+              socket.write html
+              socket.close
+            end
+          end
+        else
+          html = HTML.new.html_string(request.errors[:body])
+          responce = Response.new({responce_code: request.errors[:responce_code], html: html})
+          socket.write responce.responce
+          socket.write "\r\n"  
+          socket.write html
+          socket.close
           next
         end
-        
-        unless PERMITTED_HOSTS.include?(host[1])
-          Answer.new(socket, html_string('Данный хост не поддерживается'), "400 Bad Request").answer
-          next
-        end
-
-        if host[1] == "branch1.mybank.ru"
-          branch1 = Branch.new(socket, "deposits")
-          branch1.add_deposit(10,10)
-          branch1.add_deposit(20,20)
-          branch1.add_deposit(30,30)
-          branch1.branch_answer(method[1])
-        end   
-
-        if host[1] == "branch2.mybank.ru"
-          branch2 = Branch.new(socket, "deps")
-          branch2.add_deposit(40,40)
-          branch2.add_deposit(50,50)
-          branch2.branch_answer(method[1])
-        end 
       end
-end
