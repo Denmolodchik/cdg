@@ -1,6 +1,8 @@
 class Branch2
-  attr_accessor :path, :errors
+  attr_accessor :id, :errors
+
   PERMITTED_PATHS = ['deps']
+
   def initialize(path)
       if PERMITTED_PATHS.include?(path.split('/')[1]) && path.split('/').count == 3
         @id = path.split('/')[2]

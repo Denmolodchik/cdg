@@ -1,12 +1,13 @@
+require_relative 'model_branch1'
 class Controller1
+
   attr_accessor :deposit, :errors
-  def initialize(path)
-    if path.split('/')[2] == '1'
-      @deposit = {responce_code: "200 OK", deposit: {id: 1, months: 10, percent: 10}}
-    elsif path.split('/')[2] == '2'
-      @deposit = {responce_code: "200 OK", deposit: {id: 2, months: 20, percent: 20}}
-    elsif path.split('/')[2] == '3'
-      @deposit = {responce_code: "200 OK", deposit: {id: 3, months: 30, percent: 30}}
+  
+  def show(id)
+    _deposit = ModelBranch1.new
+    _deposit.search(id)
+    unless _deposit.errors
+      @deposit = {responce_code: "200 OK", body: {id: id, months: _deposit.deposit[:months], percent: _deposit.deposit[:percent]}}
     else
       @errors = {responce_code: "404 Not Found", body: "Депозита с таким именем не существует"}
     end

@@ -1,9 +1,9 @@
-class ModelBranch1 
+class ModelBranch2 
   attr_accessor :errors, :deposit
   attr_reader :database
 
   def initialize
-    @database = {'1': {months: 10, percent: 10},'2': {months: 20, percent: 20},'3': {months: 30, percent: 30}}
+    @database = {'1': {months: 40, percent: 40},'2': {months: 50, percent: 50}}
   end
 
   def search(id)

@@ -1,61 +1,83 @@
 require_relative 'responce'
 require_relative 'html'
 require_relative 'branch1'
+require_relative 'branch2'
 require_relative 'request'
 require_relative 'controller1'
+require_relative 'controller2'
 require 'socket'
 
-  server = TCPServer.new 80
+class Server
+  def initialize
+    @server = TCPServer.new 80
+    @applications = { 'branch1.mybank.ru': '1', 'branch2.mybank.ru': '2' }
+  end
 
-      loop do
-        socket = server.accept
-        i = 0
-        request = Array.new
+  def run
+    loop do
+      socket = @server.accept
 
-        while (line = socket.gets.chomp) do
-          break if line.empty?
-          request[i] = line.chomp
-          i += 1       
-        end
+      request_array = read_HTTP_request(socket)
 
-        request = Request.new(request)
+      request = Request.new(request_array)
 
-        unless request.errors
-          if request.headers['Host'] == 'branch1.mybank.ru'
-            branch1 = Branch1.new(request.path)
-            unless branch1.errors
-              controller = Controller1.new(branch1.id)
-              unless controller.errors
-                html = HTML.new.html_deposit(controller.deposit[:deposit])
-                responce = Response.new({responce_code: controller.deposit[:responce_code], html: html})
-                socket.write responce.responce
-                socket.write "\r\n"  
-                socket.write html
-                socket.close
-              else
-                html = HTML.new.html_string(controller.errors[:body])
-                responce = Response.new({responce_code: controller.errors[:responce_code], html: html})
-                socket.write responce.responce
-                socket.write "\r\n"  
-                socket.write html
-                socket.close
-              end
+      if request.errors
+        responce_HTTP_server(request.errors, socket)
+        next
+      else
+        if @applications.keys.include?(request.headers['Host'].to_sym)
+          branch = eval "Branch#{@applications[request.headers['Host'].to_sym]}.new(request.path)"
+          if branch.errors
+            responce_HTTP_server(branch.errors, socket)
+            next
+          else
+            controller = eval "Controller#{@applications[request.headers['Host'].to_sym]}.new"
+            controller.show(branch.id)
+            if controller.errors
+              responce_HTTP_server(controller.errors, socket)
+              next
             else
-              html = HTML.new.html_string(branch1.errors[:body])
-              responce = Response.new({responce_code: branch1.errors[:responce_code], html: html})
-              socket.write responce.responce
-              socket.write "\r\n"  
-              socket.write html
-              socket.close
+              responce_HTTP_server(controller.deposit, socket)
+              next
             end
           end
-        else
-          html = HTML.new.html_string(request.errors[:body])
-          responce = Response.new({responce_code: request.errors[:responce_code], html: html})
-          socket.write responce.responce
-          socket.write "\r\n"  
-          socket.write html
-          socket.close
-          next
         end
       end
+    end
+  end
+
+  def read_HTTP_request(socket)
+    request = Array.new
+    while (line = socket.gets.chomp) && !line.empty? do
+      request << line
+    end
+    request
+  end
+
+  def responce_HTTP_server(responce, socket)
+    html = create_HTML(responce)
+    send_responce(html, responce[:responce_code], socket)
+  end
+
+  def send_responce(html, responce_code, socket)
+    responce = Response.new({responce_code: responce_code, html: html})
+    socket.write responce.responce
+    socket.write "\r\n"  
+    socket.write html
+    socket.close
+  end
+
+  def create_HTML(responce)
+    html = HTML.new
+    code = responce[:responce_code].split[0].to_i
+    if code == 200
+      html.html_deposit(responce[:body])
+    else
+      html.html_string(responce[:body])
+    end
+  end
+
+end
+
+server = Server.new
+server.run
