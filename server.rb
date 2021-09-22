@@ -23,22 +23,18 @@ class Server
 
       if request.errors
         responce_HTTP_server(request.errors, socket)
-        next
       else
         if @applications.keys.include?(request.headers['Host'].to_sym)
           branch = eval "Branch#{@applications[request.headers['Host'].to_sym]}.new(request.path)"
           if branch.errors
             responce_HTTP_server(branch.errors, socket)
-            next
           else
             controller = eval "Controller#{@applications[request.headers['Host'].to_sym]}.new"
             controller.show(branch.id)
             if controller.errors
               responce_HTTP_server(controller.errors, socket)
-              next
             else
               responce_HTTP_server(controller.deposit, socket)
-              next
             end
           end
         end
@@ -60,8 +56,8 @@ class Server
   end
 
   def send_responce(html, responce_code, socket)
-    responce = Response.new({responce_code: responce_code, html: html})
-    socket.write responce.responce
+    responce = Response.new.show({responce_code: responce_code, html: html})
+    socket.write responce
     socket.write "\r\n"  
     socket.write html
     socket.close
