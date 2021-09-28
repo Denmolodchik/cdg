@@ -3,8 +3,6 @@ require_relative 'html'
 require_relative 'branch1'
 require_relative 'branch2'
 require_relative 'request'
-require_relative 'controller1'
-require_relative 'controller2'
 require 'socket'
 
 class Server
@@ -26,12 +24,10 @@ class Server
         responce_http_server(request.errors, socket)
       else
         if @applications.keys.include?(request.headers['Host'])
-          branch = @applications[request.headers['Host']].new(request.path)
-          if branch.error
-            responce_http_server(branch.error, socket)
-          else
-            responce_http_server(branch.deposit, socket)
-          end
+          branch = @applications[request.headers['Host']].routing(request.path)
+          responce_http_server(branch, socket)
+        else
+          responce_http_server({responce_code: 400, body: HTML.new.html_error('Такого сабдомена не существует')},socket)
         end
       end
     end
