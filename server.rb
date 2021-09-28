@@ -5,8 +5,8 @@ require_relative 'branch2'
 require_relative 'request'
 require 'socket'
 
-$PORT = 80
-$APPLICATIONS = { 'branch1.mybank.ru' => Branch1, 'branch2.mybank.ru' => Branch2 }
+PORT = 80
+APPLICATIONS = { 'branch1.mybank.ru' => Branch1, 'branch2.mybank.ru' => Branch2 }
 
 class Server
   def initialize(port, applications)
@@ -26,9 +26,9 @@ class Server
       if request.error
         responce_http_server(request.error, socket)
       else
-        if @applications.keys.include?(request.headers['Host'])
-          branch = @applications[request.headers['Host']].routing(request.path)
-          responce_http_server(branch, socket)
+        branch = @applications[request.headers['Host']]
+        if branch
+          responce_http_server(branch.routing(request.path), socket)
         else
           responce_http_server( { responce_code: 400, body: HTML.html_error('Такого сабдомена не существует') } , socket)
         end
@@ -54,5 +54,5 @@ class Server
 
 end
 
-server = Server.new($PORT, $APPLICATIONS)
+server = Server.new(PORT, APPLICATIONS)
 server.run
