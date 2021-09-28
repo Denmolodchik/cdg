@@ -1,11 +1,9 @@
 class Response
-    attr_accessor :responce
-
-    def show(args)<<~HTTP
-          HTTP/1.1 #{args[:responce_code]}\r\n" +
-          Content-Type: text/html; charset=utf-8\r\n" +
-          Content-Length: #{args[:html].bytesize}\r\n"
-        HTTP
-    end
-    
+  def self.show(responce_code, html)
+    <<~HTTP
+      HTTP/1.1 #{responce_code} 
+      Content-Type: text/html; charset=utf-8 
+      Content-Length: #{html.bytesize}
+    HTTP
+  end
 end

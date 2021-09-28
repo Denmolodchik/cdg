@@ -5,11 +5,14 @@ require_relative 'branch2'
 require_relative 'request'
 require 'socket'
 
+$PORT = 80
+$APPLICATIONS = { 'branch1.mybank.ru' => Branch1, 'branch2.mybank.ru' => Branch2 }
+
 class Server
-  def initialize
-    @server = TCPServer.new 80
-    @applications = { 'branch1.mybank.ru' => Branch1, 'branch2.mybank.ru' => Branch2 }
-    @responce_codes = {200 => '200 OK', 400 => '400 Bad Request', 404 => 'Not Found'}
+  def initialize(port, applications)
+    @server = TCPServer.new port
+    @applications = applications
+    @responce_codes = { 200 => '200 OK', 400 => '400 Bad Request', 404 => 'Not Found' }
   end
 
   def run
@@ -20,14 +23,14 @@ class Server
 
       request = Request.new(request_array)
 
-      if request.errors
-        responce_http_server(request.errors, socket)
+      if request.error
+        responce_http_server(request.error, socket)
       else
         if @applications.keys.include?(request.headers['Host'])
           branch = @applications[request.headers['Host']].routing(request.path)
           responce_http_server(branch, socket)
         else
-          responce_http_server({responce_code: 400, body: HTML.new.html_error('Такого сабдомена не существует')},socket)
+          responce_http_server( { responce_code: 400, body: HTML.html_error('Такого сабдомена не существует') } , socket)
         end
       end
     end
@@ -42,14 +45,14 @@ class Server
   end
 
   def responce_http_server(_responce, socket)
-    responce = Response.new.show({responce_code: @responce_codes[_responce[:responce_code]], html: _responce[:body]})
+    responce = Response.show( @responce_codes[_responce[:responce_code]], _responce[:body] )
     socket.write responce
-    socket.write "\r\n"  
+    socket.write "\r\n"
     socket.write _responce[:body]
     socket.close
   end
 
 end
 
-server = Server.new
+server = Server.new($PORT, $APPLICATIONS)
 server.run
