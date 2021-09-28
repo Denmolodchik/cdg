@@ -1,10 +1,10 @@
 require_relative 'controller1'
 class Branch1
-  PERMITTED_PATHS = ['deposits']
+  PATTERN = /^\/(deposits)\/([0-9]+)$/m
 
   def self.routing(path)
-    path = path.split('/')
-    if PERMITTED_PATHS.include?(path[1]) && path.count == 3
+    path = path.match(PATTERN)
+    if path
       Controller1.show(path[2])
     else
       {responce_code: 400, body: HTML.html_error('Вы ввели неправильный путь')}
