@@ -7,8 +7,4 @@ class BranchModel1 < BaseModel
     { id: 3, months: 30, percent: 30 }
   ]
   DATABASE = DATA.to_h { [_1[:id], _1] }
-
-  def self.find_by(id)
-    super
-  end
 end
