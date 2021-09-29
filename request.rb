@@ -1,18 +1,18 @@
 class Request
   attr_accessor :path, :headers, :error
 
-  PATTERN = /^(GET|HEAD) ([A-Za-z0-9\/]+) (HTTP)\/(1.1)$/m
+  PATTERN = /\A(GET|HEAD)\s(?<path>[A-Za-z0-9\/]+)\sHTTP\/1\.1\z/
 
   def initialize(request) 
     line1 = request.shift.match(PATTERN)
     if line1
-      @path = line1[2]
+      @path = line1['path']
       @headers = request.to_h do |line|
-        line = line.split(': ')
-        [line[0], line[1]] 
+        name, value = line.split(': ')
+        [name, value] 
       end
     else
-      @error = { responce_code: "400 Bad Request", body: "Вы ввели неправильный метод" }
+      @error = { response_code: 400, body: "Вы ввели неправильный метод" }
     end
   end
 end

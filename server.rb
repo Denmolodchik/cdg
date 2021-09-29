@@ -1,4 +1,4 @@
-require_relative 'responce'
+require_relative 'response'
 require_relative 'html'
 require_relative 'branch1'
 require_relative 'branch2'
@@ -12,7 +12,6 @@ class Server
   def initialize(port, applications)
     @server = TCPServer.new port
     @applications = applications
-    @responce_codes = { 200 => '200 OK', 400 => '400 Bad Request', 404 => 'Not Found' }
   end
 
   def run
@@ -24,13 +23,13 @@ class Server
       request = Request.new(request_array)
 
       if request.error
-        responce_http_server(request.error, socket)
+        response_http_server(request.error, socket)
       else
         branch = @applications[request.headers['Host']]
         if branch
-          responce_http_server(branch.routing(request.path), socket)
+          response_http_server(branch.routing(request.path), socket)
         else
-          responce_http_server( { responce_code: 400, body: HTML.html_error('Такого сабдомена не существует') } , socket)
+          response_http_server( { response_code: 400, body: HTML.html_error('Такого сабдомена не существует') } , socket)
         end
       end
     end
@@ -44,11 +43,9 @@ class Server
     request
   end
 
-  def responce_http_server(_responce, socket)
-    responce = Response.show( @responce_codes[_responce[:responce_code]], _responce[:body] )
-    socket.write responce
-    socket.write "\r\n"
-    socket.write _responce[:body]
+  def response_http_server(output, socket)
+    response = Response.new( output[:response_code], output[:body] )
+    socket.write response.render
     socket.close
   end
 
