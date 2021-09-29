@@ -19,9 +19,9 @@ class Server
       socket = @server.accept
 
       request_array = read_http_request(socket)
+      puts request_array
 
       request = Request.new(request_array)
-
       if request.error
         response_http_server(request.error, socket)
       else

@@ -1,7 +1,7 @@
 class Request
   attr_accessor :path, :headers, :error
 
-  PATTERN = /\A(GET|HEAD)\s(?<path>[A-Za-z0-9\/]+)\sHTTP\/1\.1\z/
+  PATTERN = /\A(GET|HEAD|POST)\s(?<path>[A-Za-z0-9\/?&=]+)\sHTTP\/1\.1\z/
 
   def initialize(request) 
     line1 = request.shift.match(PATTERN)

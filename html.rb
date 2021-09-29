@@ -22,4 +22,20 @@ class HTML
       </html>
     HTML
   end
+
+  def self.html_form
+    <<~HTML
+    <html>
+      <link rel="icon" href="data:,">
+      <body>
+      <form action="create" method="POST" enctype = "multipart/form-data">
+        Введите условия депозита <br/>
+        Количество месяцев: <input type="number" name="months"><br/>
+        Проценты: <input type="number" name="precent"><br/>
+        <input type = "submit" value = "Добавить депозит"></button>
+      </form>
+     </body>
+    </html>
+    HTML
+  end
 end
