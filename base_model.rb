@@ -1,7 +1,7 @@
 class BaseModel
-  def self.find_by(id)
-    self::DATABASE[id.to_i]
-  end
+  #def self.find_by(id)
+  #  self::DATABASE[id.to_i]
+  #end
 
   def self.validate(body)
     if !(body['months'] && body['precent'])

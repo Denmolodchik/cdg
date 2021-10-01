@@ -12,8 +12,7 @@ class Controller1 < BaseController
     if deposit 
       deposit
     else
-      #deposit = BranchModel.add_deposit(body)
-      #deposit
+      show(BranchModel1.add_deposit(body).to_s)
     end
   end
 end
