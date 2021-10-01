@@ -6,4 +6,14 @@ class Controller1 < BaseController
     deposit = BranchModel1.find_by(id)
     render(deposit)
   end
+
+  def create(body)
+    deposit = BranchModel1.validate(body)
+    if deposit 
+      deposit
+    else
+      #deposit = BranchModel.add_deposit(body)
+      #deposit
+    end
+  end
 end

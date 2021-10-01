@@ -17,17 +17,16 @@ class Server
   def run
     loop do
       socket = @server.accept
+      request_string = read_http_request(socket)
 
-      request_array = read_http_request(socket)
-      puts request_array
+      request = Request.new(request_string)
 
-      request = Request.new(request_array)
       if request.error
         response_http_server(request.error, socket)
       else
         branch = @applications[request.headers['Host']]
         if branch
-          response_http_server(branch.routing(request.path), socket)
+          response_http_server(branch.routing(request.path, request.body), socket)
         else
           response_http_server( { response_code: 400, body: HTML.html_error('Такого сабдомена не существует') } , socket)
         end
@@ -36,11 +35,7 @@ class Server
   end
 
   def read_http_request(socket)
-    request = Array.new
-    while (line = socket.gets.chomp) && !line.empty? do
-      request << line
-    end
-    request
+    socket.recvmsg[0]
   end
 
   def response_http_server(output, socket)
