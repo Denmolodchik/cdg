@@ -17,7 +17,6 @@ class Server
   def run
     loop do
       socket = @server.accept
-
       request_string = read_http_request(socket)
       request = Request.new(request_string)
 

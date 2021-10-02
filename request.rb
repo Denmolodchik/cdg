@@ -1,7 +1,7 @@
 class Request
   attr_accessor :path, :headers, :body, :error
 
-  PATTERN = /(?<METHOD>\w+) \/(?<RESOURCE>[^ ]*) HTTP\/1.\d\r\n(?<HEADERS>(.+\r\n)*)(?:\r\n)?(?<BODY>(.|\s)*)/i
+  PATTERN = /(?<METHOD>GET|HEAD|POST) \/(?<RESOURCE>[^ ]*) HTTP\/1.\d\r\n(?<HEADERS>(.+\r\n)*)(?:\r\n)?(?<BODY>(.|\s)*)/i
 
   def initialize(request) 
     request = request.match(PATTERN)
