@@ -4,7 +4,8 @@ class Response
   RESPONSE_CODES = {
     200 => '200 OK',
     400 => '400 Bad Request',
-    404 => '404 Not Found'
+    404 => '404 Not Found',
+    412 => 'Precondition Failed'
   }
 
   def initialize(response_code, html)

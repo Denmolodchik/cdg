@@ -38,4 +38,15 @@ class HTML
     </html>
     HTML
   end
+
+  def self.redirect_to(path)
+    <<~HTML
+    <html>
+      <head>
+        <link rel="icon" href="data:,">
+        <meta http-equiv="refresh" content="0;URL=#{ path }" />
+      </head>
+    </html>
+    HTML
+  end
 end
