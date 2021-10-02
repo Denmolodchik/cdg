@@ -25,7 +25,7 @@ class Server
         else
           branch = @applications[request.headers['Host']]
           if branch
-            response_http_server(branch.routing(request.path, request.body), socket)
+            response_http_server(branch.routing(request.path, request.body,request.headers['Referer']), socket)
           else
             response_http_server( { response_code: 400, body: HTML.html_error('Такого сабдомена не существует') } , socket)
           end
