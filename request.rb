@@ -1,3 +1,5 @@
+require 'cgi'
+
 class Request
   attr_accessor :path, :headers, :body, :error
 
@@ -10,7 +12,7 @@ class Request
       @headers = hash_headers(request['HEADERS'])
       @body = hash_body(request['BODY'])
     else
-      @error = { response_code: 400, body: "Вы ввели неправильный метод" }
+      @error = { response_code: 400, body: "Неверный формат запроса" }
     end
   end
 
@@ -26,11 +28,8 @@ class Request
     if body.empty?
       nil
     else
-      body = body.split('&')
-      body.to_h do |line|
-        name, value = line.split('=')
-        [name, value] 
-      end
+      body = CGI.parse(body)
+      body.to_h { |key,value| [key,value[0].to_i] }
     end
   end
 end
