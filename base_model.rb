@@ -1,12 +1,6 @@
 class BaseModel
   def self.validate(body)
-    if !(body['months'] && body['precent'])
-      "Поля количество месяцов и процент не могут быть пустыми"
-    elsif (body['months'].to_i <= 0) || (body['precent'].to_i <= 0)
-      "Поля количество месяцов и процент не могут быть меньше или равняться нулю"
-    else
-      nil
-    end
+    "Все поля должны быть заполнены значениями больше нуля" if (body['months'].to_i <= 0) || (body['precent'].to_i <= 0)
   end
 
   def self.find_by(id)
@@ -15,8 +9,6 @@ class BaseModel
     if index
       deposit = database[index]
       { id: deposit['id'], months: deposit['months'], percent: deposit['percent']}
-    else
-      nil
     end
   end
 
